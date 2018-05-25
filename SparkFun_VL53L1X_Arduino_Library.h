@@ -39,66 +39,52 @@
 #ifndef SPARKFUN_VL53L1X_ARDUINO_LIBRARY_H
 #define SPARKFUN_VL53L1X_ARDUINO_LIBRARY_H
 
-#if (ARDUINO >= 100)
-#else
-#endif
+
 
 
 #include "vl53l1_register_map.h"
+#include <unistd.h>				//Needed for I2C port
+#include <fcntl.h>				//Needed for I2C port
+#include <sys/ioctl.h>			//Needed for I2C port
+#include <linux/i2c-dev.h>		//Needed for I2C port
+#include <iostream>
+#include <unistd.h>
+#include <stdint.h>
+
+
+#define byte uint8_t
 const byte defaultAddress_VL53L1X = 0x29; //The default I2C address for the VL53L1X on the SparkFun breakout is 0x29.
 //#define defaultAddress_VL53L1X 0x29 //The default I2C address for the VL53L1X on the SparkFun breakout is 0x29.
+//int i2c_port; //raspberry pi I2C handle
 
-//Platform specific configurations
-
-//Define the size of the I2C buffer based on the platform the user has
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 
-//I2C_BUFFER_LENGTH is defined in Wire.H
-#define I2C_BUFFER_LENGTH BUFFER_LENGTH
-
-#elif defined(__SAMD21G18A__)
-
-//SAMD21 uses RingBuffer.h
-#define I2C_BUFFER_LENGTH SERIAL_BUFFER_SIZE
-
-#elif __MK20DX256__
-//Teensy
-
-#elif ARDUINO_ARCH_ESP32
-//ESP32 based platforms
-
-#else
-
-//The catch-all default is 32
-#define I2C_BUFFER_LENGTH 32
-
-#endif
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+using namespace std;
 
 class VL53L1X {
   public:
 
-    boolean begin(uint8_t deviceAddress = defaultAddress_VL53L1X, TwoWire &wirePort = Wire); //By default use the default I2C address, and use Wire port
+    bool begin(uint8_t deviceAddress = defaultAddress_VL53L1X); //By default use the default I2C address, and use Wire port
 
     void softReset(); //Reset the sensor via software
     void startMeasurement(uint8_t offset = 0); //Write a block of bytes to the sensor to configure it to take a measurement
-    boolean newDataReady(); //Polls the measurement completion bit
+    bool newDataReady(); //Polls the measurement completion bit
     uint16_t getDistance(); //Returns the results from the last measurement, distance in mm
     uint16_t getSignalRate(); //Returns the results from the last measurement, signal rate
     uint8_t getRangeStatus(); //Returns the results from the last measurement, 0 = valid
 
     uint8_t readRegister(uint16_t addr); //Read a byte from a 16-bit address
     uint16_t readRegister16(uint16_t addr); //Read two bytes from a 16-bit address
-    boolean writeRegister(uint16_t addr, uint8_t val); //Write a byte to a spot
-    boolean writeRegister16(uint16_t addr, uint16_t val); //Write two bytes to a spot
-
+    bool writeRegister(uint16_t addr, uint8_t val); //Write a byte to a spot
+    bool writeRegister16(uint16_t addr, uint16_t val); //Write two bytes to a spot
+   // int i2cInit(void);
   private:
 
     //Variables
-    TwoWire *_i2cPort; //The generic connection to user's chosen I2C hardware
     uint8_t _deviceAddress; //Keeps track of I2C address. setI2CAddress changes this.
 };
 
+
 #endif
+
 

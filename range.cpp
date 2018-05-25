@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 int main()
 {
    int fd, result;
@@ -18,8 +19,11 @@ int main()
    usleep(500);
    //result = wiringPiI2CWriteReg16(fd, 0x40, (i & 0xfff) );
 while(1){
+   fd = 3;
    unsigned char MSB,LSB;
    wiringPiI2CWriteReg8(fd,0x01,0x0F);
+   //wiringPiI2CWrite (fd, 0x01);
+   //wiringPiI2CWrite (fd, 0x0F);
    MSB = wiringPiI2CRead(fd);
    LSB = wiringPiI2CRead(fd);
    result = MSB<<8|LSB;
@@ -27,3 +31,4 @@ while(1){
    usleep(500);   
    }
 }
+
